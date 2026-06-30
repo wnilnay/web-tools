@@ -1,6 +1,6 @@
 (function() {
     // Remove third-party player UI elements
-    var kill = ['.plyr__controls','.plyr__ads','.plyr__poster','.plyr__preview-scrubbing','.vjs-control-bar','.vjs-poster','.dplayer-controller','.dplayer-mask','.jw-controls','.jw-overlays'];
+    var kill = ['.plyr__controls','.plyr__ads','.plyr__poster','.plyr__preview-scrubbing','.vjs-control-bar','.vjs-poster','.dplayer-controller','.dplayer-mask','.jw-controls','.jw-overlays','.plyr__control--overlaid','.plyr__captions','.plyr__menu'];
     function nuke(r) {
         try {
             r.querySelectorAll(kill.join(',')).forEach(function(e) { e.remove(); });
@@ -62,7 +62,7 @@
         // ---- Step 1: Disable native controls and style video ----
         v.controls = false;
         v.style.setProperty('width','100%','important');
-        v.style.setProperty('height','100%','important');
+        v.style.setProperty('height','auto','important');
         v.style.setProperty('object-fit','contain','important');
         v.style.setProperty('pointer-events','none','important'); // All events go to shield
         v.style.setProperty('display','block','important');
@@ -86,7 +86,7 @@
 
         // ---- Step 2: Create wrapper container ----
         var wrap = document.createElement('div');
-        wrap.style.cssText = 'position:relative;display:block;width:100%;height:100%;z-index:2147483645;';
+        wrap.style.cssText = 'position:relative;display:block;width:100%;z-index:2147483645;';
         v.parentNode.insertBefore(wrap, v);
         wrap.appendChild(v);
 
