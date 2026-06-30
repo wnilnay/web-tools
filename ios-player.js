@@ -11,6 +11,10 @@
     }
     nuke(document);
 
+    // Aggressive cleanup: keep nuking player UI for 5s (handles dynamic re-renders)
+    var cleanupTimer = setInterval(function() { nuke(document); }, 800);
+    setTimeout(function() { clearInterval(cleanupTimer); }, 5000);
+
     // Find all video elements (including shadow DOM & iframes)
     function findVids(r) {
         var v = [];
@@ -82,7 +86,7 @@
 
         // ---- Step 2: Create wrapper container ----
         var wrap = document.createElement('div');
-        wrap.style.cssText = 'position:relative;display:block;width:100%;height:100%;';
+        wrap.style.cssText = 'position:relative;display:block;width:100%;height:100%;z-index:2147483645;';
         v.parentNode.insertBefore(wrap, v);
         wrap.appendChild(v);
 
