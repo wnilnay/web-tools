@@ -1,8 +1,18 @@
 (function() {
     let uiKillList = ['.plyr__controls', '.plyr__ads', '.plyr__poster', '.plyr__preview-scrubbing', '.vjs-control-bar', '.vjs-poster', '.dplayer-controller', '.dplayer-mask', '.jw-controls', '.jw-overlays'];
 
+    // 註：因為要改用自訂 UI，你可能需要幫我把這個強制原生控制列顯示的 injectStyle 邏輯移除或修改
+    function injectStyle(doc) {
+        if (!doc || doc.getElementById('force-controls')) return;
+        let s = doc.createElement('style');
+        s.id = 'force-controls';
+        s.innerHTML = 'video::-webkit-media-controls,video::-webkit-media-controls-enclosure,video::-webkit-media-controls-panel{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;}';
+        if (doc.head) doc.head.appendChild(s);
+    }
+
     function nukeUI(root) {
         try {
+            if (root.nodeType === 9) injectStyle(root);
             root.querySelectorAll(uiKillList.join(',')).forEach(el => el.remove());
             root.querySelectorAll('iframe').forEach(ifr => {
                 try {
@@ -37,21 +47,30 @@
         return;
     }
 
-    let v = allVideos[0];
-    v.controls = false; // 關閉原生控制列，準備實作自訂 UI
-    v.style.setProperty('width', '100%', 'important');
-    v.style.setProperty('height', '100%', 'important');
-    v.style.setProperty('object-fit', 'contain', 'important');
-    
-    // 解決部分框架阻擋點擊的問題
-    let p = v.parentElement;
-    while (p && p !== document.body) {
-        if (p.classList && (p.classList.contains('plyr__video-wrapper') || p.classList.contains('plyr'))) {
-            p.style.setProperty('padding-bottom', '0', 'important');
-            p.style.setProperty('height', 'auto', 'important');
+    allVideos.forEach(v => {
+        v.controls = true; // 請幫我改成 false，並實作自訂 UI
+        v.style.setProperty('width', '100%', 'important');
+        v.style.setProperty('height', '100%', 'important');
+        v.style.setProperty('object-fit', 'contain', 'important');
+        v.style.setProperty('pointer-events', 'auto', 'important');
+        v.style.setProperty('display', 'block', 'important');
+        v.style.setProperty('visibility', 'visible', 'important');
+        v.style.setProperty('opacity', '1', 'important');
+        v.style.setProperty('z-index', '2147483647', 'important');
+        v.style.setProperty('position', 'relative', 'important');
+        
+        let p = v.parentElement;
+        while (p && p !== document.body) {
+            if (window.getComputedStyle(p).pointerEvents === 'none') {
+                p.style.setProperty('pointer-events', 'auto', 'important');
+            }
+            if (p.classList && (p.classList.contains('plyr__video-wrapper') || p.classList.contains('plyr'))) {
+                p.style.setProperty('padding-bottom', '0', 'important');
+                p.style.setProperty('height', 'auto', 'important');
+            }
+            p = p.parentElement;
         }
-        p = p.parentElement;
-    }
+    });
 
     function showToast(msg) {
         let t = document.createElement('div');
@@ -64,6 +83,6 @@
         }, 2500);
     }
     
-    // 請在此處接續寫入「透明防護罩」與「iOS 風格 UI 注入」的邏輯
-    showToast('✅ 準備就緒，啟動防護罩與自訂播放器！');
+    // 請在此處接續寫入 UI 注入與事件綁定的邏輯
+    showToast('✅ 影片已接管，請準備注入自訂 UI！');
 })();
