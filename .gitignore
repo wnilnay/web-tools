@@ -1,0 +1,4 @@
+# Ignore everything except .js files and .gitignore
+*.*
+!*.js
+!.gitignore
